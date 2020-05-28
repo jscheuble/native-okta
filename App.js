@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Button, AsyncStorage } from 'react-native';
+import { StyleSheet, View, Button, AsyncStorage, Alert } from 'react-native';
 import * as AuthSession from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
 import { ISSUER } from 'react-native-dotenv';
@@ -13,6 +13,8 @@ const useProxy = true;
 
 export default function App() {
 
+  const [validToken, setValidToken] = useState(false);
+
   const discovery = AuthSession.useAutoDiscovery(ISSUER);
 
   const [request, response, promptAsync] = AuthSession.useAuthRequest(
@@ -20,10 +22,10 @@ export default function App() {
     discovery
   );
 
-  //Get Token
-  // const removeToken = async () => {
-  //   return await AsyncStorage.removeItem("access_token");
-  // };
+  //  Get Token
+  const removeToken = async () => {
+    return await AsyncStorage.removeItem("access_token");
+  };
   const getToken = async () => {
     return await AsyncStorage.getItem("access_token");
   };
@@ -38,6 +40,7 @@ export default function App() {
           //Ping Backend to validate token
 
           console.log('success')
+          setValidToken(true);
           //Navigates to Families Screen
           //props.navigation.replace("Families");
         } else {
@@ -45,6 +48,7 @@ export default function App() {
           console.log('config', config)
           await promptAsync({ useProxy }).then((res) => {
             AsyncStorage.setItem("access_token", res.params.access_token);
+            setValidToken(true);
             //navigates to families screen
             //props.navigation.replace("Families");
           });
@@ -53,9 +57,34 @@ export default function App() {
       .catch((err) => console.log(err));
   };
 
+  const handleLogout = () => {
+    console.log('logging out')
+    Alert.alert(
+      "Logging Out",
+      "Are you sure you want to log out? \n You won't be able to sign back in OFFLINE!",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Canceled"),
+          style: "cancel",
+        },
+        {
+          text: "OK",
+          onPress: () => {
+            removeToken();
+            setValidToken(false);
+          },
+        },
+      ],
+      { cancelable: false }
+    );
+  }
+
   return (
     <View style={styles.container}>
-      <Button title='login' onPress={handleLogin} />
+      {validToken
+        ? <Button title='logout' onPress={handleLogout} />
+        : <Button title='login' onPress={handleLogin} />}
     </View>
   );
 }
