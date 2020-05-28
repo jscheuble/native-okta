@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, View, Button, AsyncStorage } from 'react-native';
 import * as AuthSession from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
@@ -37,14 +37,16 @@ export default function App() {
           //Check if token is valid
           //Ping Backend to validate token
 
+          console.log('success')
           //Navigates to Families Screen
-          props.navigation.replace("Families");
+          //props.navigation.replace("Families");
         } else {
           //Gets New Token
+          console.log('config', config)
           await promptAsync({ useProxy }).then((res) => {
             AsyncStorage.setItem("access_token", res.params.access_token);
             //navigates to families screen
-            props.navigation.replace("Families");
+            //props.navigation.replace("Families");
           });
         }
       })

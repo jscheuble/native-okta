@@ -2,6 +2,9 @@
   "expo": {
     "name": "okta-test",
     "slug": "okta-test",
+    "privacy": "public",
+    "sdkVersion": "36.0.0",
+    "scheme": "app",
     "platforms": [
       "ios",
       "android",
